@@ -19,9 +19,6 @@ def capitals(word):
         if word.isupper() and word != "I":
                 word = word.lower()
     
-        elif word[0].isupper():
-                word = word.lower().capitalize()
-        
         else:
                 word = word.lower()
     
@@ -31,25 +28,24 @@ def capitals(word):
 def make_graph(wordlist, n):
     
         starts = []
-        starts.append(wordlist[:n])
-        graph = {}
+        starts.append(wordlist[0])
+        graph = defaultdict(list)
 
-        for i in tqdm(range(len(wordlist))):
+        for i in tqdm(range(len(wordlist)-n)):
 
                 history = tuple(wordlist[i:i+n+1])
                                
-                for i in range(1, len(history)-1):
+                for i in range(len(history)):
 
-                        h = history[:n]
-                        follow = [history[-1]]
+               	 	h = history[:i]
+                	follow = history[i]
                  
-                        if h in graph:
-                                graph[h].append(follow)
-                        else:
-                                graph[h] = [follow] 
+                        
+                	graph[h].append(follow) 
                 
-                        if "." in history and ".?!," not in history[-1]:
-                                starts.append(history[-1])
+                if "." == history[-2] and history[-1] not in ".?!,":
+				
+                	starts.append(history[-1])
 
 
 
@@ -57,15 +53,15 @@ def make_graph(wordlist, n):
 
 
 def get_connections(path, graph, n):
-        
-        state = path[-n:]
-        while tuple(state) not in graph:
+	       
+ 	state = path[-n:]
+        while tuple(state,) not in graph:
                 state.pop(0)
         
         if len(state) == 0: 
                 return None
         else:
-                return graph[tuple(state)]
+                return graph[tuple(state,)]
 
 
 def get_sentence(starts, graph, n):
@@ -79,9 +75,9 @@ def get_sentence(starts, graph, n):
         while (curr not in "!?."):
                 
                 connections = get_connections(prev, graph, n)
-                curr = random.choice(connections)[0] 
+                curr = random.choice(connections) 
                 prev.append(curr)
-                print prev 
+                 
                 if (curr not in ".,!?;"):
                         sent += " " # Add spaces between words (but not punctuation)
         
@@ -92,8 +88,8 @@ def get_sentence(starts, graph, n):
 
 if __name__ == '__main__':
 
-        filename = 'test.txt'
-        n_gram_length = 3
+        filename = 'pota.txt'
+        n_gram_length = 2
 
         starts, graph = make_graph(words(filename), n_gram_length)
 
