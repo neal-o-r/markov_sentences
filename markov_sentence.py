@@ -1,8 +1,7 @@
 import re
 import random
-import sys
+from tqdm import tqdm
 from collections import defaultdict
-
 
 def words(filename):
         
@@ -28,63 +27,75 @@ def capitals(word):
     
         return word
 
-# Building and normalizing the mapping.
+
 def make_graph(wordlist, n):
     
         starts = []
-        starts.append(wordlist[0])
-        graph = defaultdict(int)
+        starts.append(wordlist[:n])
+        graph = {}
 
-        for i in range(1, len(wordlist)-1):
+        for i in tqdm(range(len(wordlist))):
 
-                if i <= n:
-                        history = wordlist[:i+1]
-
-                else:
-                        history = wordlist[i-n+1:i+1]
-
-                follow = wordlist[i+1]                
+                history = tuple(wordlist[i:i+n+1])
                                
-                graph[' '.join(history)] += 1
- 
-                if history[-1] == "." and follow not in ".,!?;":
-                        starts.append(follow)
-        
-        return graph
+                for i in range(1, len(history)-1):
 
-# Returns the next word in the sentence (chosen randomly),
-# given the previous ones.
-def next_random(prev):
+                        h = history[:n]
+                        follow = [history[-1]]
+                 
+                        if h in graph:
+                                graph[h].append(follow)
+                        else:
+                                graph[h] = [follow] 
+                
+                        if "." in history and ".?!," not in history[-1]:
+                                starts.append(history[-1])
 
+
+
+        return starts, graph
+
+
+def get_connections(path, graph, n):
         
+        state = path[-n:]
+        while tuple(state) not in graph:
+                state.pop(0)
+        
+        if len(state) == 0: 
+                return None
+        else:
+                return graph[tuple(state)]
+
 
 def get_sentence(starts, graph, n):
 
         # Start with a random "starting word"
         curr = random.choice(starts)
-        sent = curr.capitalize()
+        sent = curr.capitalize() 
     
         prev = [curr]
         # Keep adding words until we hit punctuation
         while (curr not in "!?."):
                 
-                curr = next(prevList)
-                prevList.append(curr)
+                connections = get_connections(prev, graph, n)
+                curr = random.choice(connections)[0] 
+                prev.append(curr)
+                print prev 
+                if (curr not in ".,!?;"):
+                        sent += " " # Add spaces between words (but not punctuation)
         
-        # if the prevList has gotten too long, trim it
-        if len(prevList) > markovLength:
-                prevList.pop(0)
-        
-        if (curr not in ".,!?;"):
-            sent += " " # Add spaces between words (but not punctuation)
-        
-        sent += curr
+                sent += curr
     
         return sent
 
 
 if __name__ == '__main__':
 
-        filename = 'messages.txt'
+        filename = 'test.txt'
         n_gram_length = 3
 
+        starts, graph = make_graph(words(filename), n_gram_length)
+
+        for i in range(10):
+                print(get_sentence(starts, graph, n_gram_length))
