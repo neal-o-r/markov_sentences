@@ -5,7 +5,8 @@ Markov chain sentence generator.
 He had noted the mockery in the corridor as the first verses over and the sublime, the very devils, 
 who had sinned and, though he knew his part.
 
-Church against which his father's eyes were shut fast, turning right and left him and their keys made a sound.
+Church against which his father's eyes were shut fast, 
+turning right and left him and their keys made a sound.
 
 His prayers and meditations.
 
