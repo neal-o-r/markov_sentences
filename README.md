@@ -1,6 +1,8 @@
 # Markov Sentences
 Markov chain sentence generator. 
 
+Give it A Portrait of the Artist and you get something like this back.
+
 ```
 He had noted the mockery in the corridor as the first verses over and the sublime, the very devils, 
 who had sinned and, though he knew his part.
